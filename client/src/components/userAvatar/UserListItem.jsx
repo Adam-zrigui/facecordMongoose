@@ -1,9 +1,9 @@
+import React from 'react';
 import { Avatar } from "@chakra-ui/avatar";
 import { Box, Text } from "@chakra-ui/layout";
-import { ChatState } from "../../Context/ChatProvider";
 
-const UserListItem = ({ handleFunction }) => {
-  const { user } = ChatState();
+const UserListItem = ({user, handleFunction }) => { //user !notLoggedIn //selected to chat userId
+  //const { user } = ChatState();
 
   return (
     <Box
@@ -23,19 +23,10 @@ const UserListItem = ({ handleFunction }) => {
       mb={2}
       borderRadius="lg"
     >
-      <Avatar
-        mr={2}
-        size="sm"
-        cursor="pointer"
-        name={user.name}
-        src={user.pic}
-      />
+      <Avatar mr={2} size="sm" cursor="pointer" name={user.name}/>
       <Box>
         <Text>{user.name}</Text>
-        <Text fontSize="xs">
-          <b>Email : </b>
-          {user.email}
-        </Text>
+        <Text fontSize="xs"> <b>Email : </b> {user.email} </Text>
       </Box>
     </Box>
   );

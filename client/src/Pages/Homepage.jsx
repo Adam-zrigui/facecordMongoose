@@ -1,48 +1,54 @@
+import React,{useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Box,
   Container,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
+  Box,
   Text,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
-import { useHistory } from "react-router";
 import Login from "../components/Authentication/Login";
 import Signup from "../components/Authentication/Signup";
 
-function Homepage() {
-  const history = useHistory();
+const HomePage = () => {
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("userInfo"));
+    const userInformation = JSON.parse(localStorage.getItem("userInformation"));
 
-    if (user) history.push("/chats");
-  }, [history]);
+    if (userInformation) navigate("/chats");
+  }, [navigate]);
 
   return (
     <Container maxW="xl" centerContent>
       <Box
         d="flex"
         justifyContent="center"
+        margin = "3.2rem 0 1rem 0"
         p={3}
-        bg="white"
-        w="100%"
-        m="40px 0 15px 0"
         borderRadius="lg"
-        borderWidth="1px"
+        borderColor="black" borderWidth="1px"
+        w="100%"
+        bg="blue.700"
       >
-        <Text fontSize="4xl" fontFamily="Work sans">
-          Talk-A-Tive
+        <Text
+          color="white"
+          fontSize="4xl"
+          fontFamily="Work sans"
+          fontWeight="bold"
+        >
+          Text-A-Lot
         </Text>
       </Box>
-      <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">
-        <Tabs isFitted variant="soft-rounded">
+      <Box bg="blue.50" w="100%" p={4} borderRadius="lg" borderColor="black" borderWidth="1px">
+        <Tabs isFitted variant="soft-rounded" colorScheme="cyan" >
           <TabList mb="1em">
-            <Tab>Login</Tab>
-            <Tab>Sign Up</Tab>
+            <Tab fontWeight="bold">Login</Tab>
+            <Tab fontWeight="bold">Sign Up</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -56,6 +62,6 @@ function Homepage() {
       </Box>
     </Container>
   );
-}
+};
 
-export default Homepage;
+export default HomePage;

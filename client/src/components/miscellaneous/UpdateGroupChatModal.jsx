@@ -17,23 +17,29 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
-import { ChatState } from "../../Context/ChatProvider";
+import { useState, useContext } from "react";
+import ChatContext from "../../Context/chat-context";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
+import holder from "../../api/holder";
 
-const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModal = ({  fetchAgain, setFetchAgain, fetchMessages }) => {
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [groupChatName, setGroupChatName] = useState();
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [renameloading, setRenameLoading] = useState(false);
+  const [renameLoading, setRenameLoading] = useState(false);
+
   const toast = useToast();
 
-  const { selectedChat, setSelectedChat, user } = ChatState();
+  const { selectedChat, setSelectedChat, user } = useContext(ChatContext);
+
 
   const handleSearch = async (query) => {
+
     setSearch(query);
     if (!query) {
       return;
@@ -42,20 +48,23 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     try {
       setLoading(true);
       const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.token}`}
       };
-      const { data } = await axios.get(`${bd}/api/user?search=${search}`, config);
-      console.log(data);
+
+      const { data } = await holder.get(`/api/user?search=${search}`, config);
+
+      console.log(data, 'user search response');
       setLoading(false);
       setSearchResult(data);
+
     } catch (error) {
+      
+      console.log(error.message)  
       toast({
         title: "Error Occured!",
         description: "Failed to Load the Search Results",
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
         position: "bottom-left",
       });
@@ -68,56 +77,57 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
     try {
       setRenameLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.put(
-        `${bd}/api/chat/rename`,
+      const config = { 
+          headers: { Authorization: `Bearer ${user.token}`}
+        };
+
+      const { data } = await holder.put(
+        `/api/chat/rename`,
         {
           chatId: selectedChat._id,
-          chatName: groupChatName,
+          chatName: groupChatName, //local state
         },
         config
       );
 
-      console.log(data._id);
+      console.log(data._id, data, "renaming group chat resposne");
       // setSelectedChat("");
       setSelectedChat(data);
-      setFetchAgain(!fetchAgain);
+      setFetchAgain(!fetchAgain); //window.location.reload()
       setRenameLoading(false);
+
     } catch (error) {
       toast({
         title: "Error Occured!",
         description: error.response.data.message,
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
       setRenameLoading(false);
     }
-    setGroupChatName("");
+    setGroupChatName(""); //reseting the new name field 
   };
 
-  const handleAddUser = async (user1) => {
-    if (selectedChat.users.find((u) => u._id === user1._id)) {
+  const handleAddUser = async (userToBeAdded) => {
+
+    if (selectedChat.users.find((existingUser) => existingUser._id === userToBeAdded._id)) {
       toast({
         title: "User Already in group!",
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
       return;
     }
 
-    if (selectedChat.groupAdmin._id !== user._id) {
+    if (selectedChat.groupAdmin._id !== user._id) { //admin is not loggedIn user clause
       toast({
         title: "Only admins can add someone!",
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
@@ -127,28 +137,33 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     try {
       setLoading(true);
       const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.token}`},
       };
+
       const { data } = await axios.put(
-        `${bd}/api/chat/groupadd`,
+        `/api/chat/groupadd`,
         {
           chatId: selectedChat._id,
-          userId: user1._id,
+          userId: userToBeAdded._id,
         },
         config
       );
 
       setSelectedChat(data);
+      console.log(data, 'added user data response');
+
       setFetchAgain(!fetchAgain);
       setLoading(false);
+
     } catch (error) {
+
+      console.log(error.message);
+
       toast({
         title: "Error Occured!",
         description: error.response.data.message,
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
@@ -157,12 +172,13 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     setGroupChatName("");
   };
 
-  const handleRemove = async (user1) => {
-    if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
+  const handleRemove = async (userToBeRemoved) => {
+
+    if (selectedChat.groupAdmin._id !== user._id && userToBeRemoved._id !== user._id) {
       toast({
         title: "Only admins can remove someone!",
         status: "error",
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
         position: "bottom",
       });
@@ -172,24 +188,27 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     try {
       setLoading(true);
       const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.token}` },
       };
+
       const { data } = await axios.put(
-        `${bd}/api/chat/groupremove`,
+        `/api/chat/groupremove`,
         {
           chatId: selectedChat._id,
-          userId: user1._id,
+          userId: userToBeRemoved._id,
         },
         config
       );
 
-      user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
+      userToBeRemoved._id === user._id ? setSelectedChat() : setSelectedChat(data); 
+      //leaveGroup clause //self UserBadgeItem cross
+
       setFetchAgain(!fetchAgain);
-      fetchMessages();
+      fetchMessages(); //prop passsed down from singlechat //opt 
       setLoading(false);
     } catch (error) {
+        
+      console.log(error.message);  
       toast({
         title: "Error Occured!",
         description: error.response.data.message,
@@ -242,7 +261,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                 variant="solid"
                 colorScheme="teal"
                 ml={1}
-                isLoading={renameloading}
+                isLoading={renameLoading}
                 onClick={handleRename}
               >
                 Update
@@ -259,11 +278,11 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             {loading ? (
               <Spinner size="lg" />
             ) : (
-              searchResult?.map((user) => (
+              searchResult?.map((selectedSearcheduser) => (
                 <UserListItem
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => handleAddUser(user)}
+                  key={selectedSearcheduser._id}
+                  user={selectedSearcheduser}
+                  handleFunction={() => handleAddUser(selectedSearcheduser)}
                 />
               ))
             )}
