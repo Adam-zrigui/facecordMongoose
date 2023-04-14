@@ -1,4 +1,3 @@
-import React from 'react';
 import { ViewIcon } from "@chakra-ui/icons";
 import {
   Modal,
@@ -12,30 +11,27 @@ import {
   useDisclosure,
   IconButton,
   Text,
+  Image,
 } from "@chakra-ui/react";
-import { Avatar } from "@chakra-ui/avatar";
-
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <React.Fragment>
+    <>
       {children ? (
         <span onClick={onOpen}>{children}</span>
       ) : (
         <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
       )}
-      <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered >
+      <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent h="380px" bg="purple.800">
+        <ModalContent h="410px">
           <ModalHeader
             fontSize="40px"
             fontFamily="Work sans"
             d="flex"
             justifyContent="center"
-            fontWeight="bold"
-            color="yellow.400"
           >
             {user.name}
           </ModalHeader>
@@ -46,20 +42,25 @@ const ProfileModal = ({ user, children }) => {
             alignItems="center"
             justifyContent="space-between"
           >
-            <Avatar size="2xl" name={user.name} borderColor="black" borderWidth="2px" bg="yellow.400" color="black"/>
+            <Image
+              borderRadius="full"
+              boxSize="150px"
+              src={user.pic}
+              alt={user.name}
+            />
             <Text
-              fontSize={{ base: "28px", md: "30px" }} fontWeight="bold" color="yellow.400"
+              fontSize={{ base: "28px", md: "30px" }}
               fontFamily="Work sans"
             >
               Email: {user.email}
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose} colorScheme='red'>Close</Button>
+            <Button onClick={onClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </React.Fragment>
+    </>
   );
 };
 

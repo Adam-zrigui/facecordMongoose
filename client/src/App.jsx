@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import ErrorFallback from "./components/ErrorBoundary";
 import { ErrorBoundary } from "react-error-boundary";
 import { Spinner } from "@chakra-ui/react";
+
 const HomePage = React.lazy(() => import("./Pages/HomePage"));
 const ChatPage = React.lazy(() => import("./Pages/ChatPage"));
 function App() {

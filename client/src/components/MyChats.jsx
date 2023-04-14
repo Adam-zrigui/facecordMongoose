@@ -1,58 +1,49 @@
-import React, { useEffect, useState, useContext } from 'react';
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Stack, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
-import axios from "axios";
-import ChatContext from "../Context/chat-context";
+import { useEffect, useState } from "react";
 import { getSender } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { Button } from "@chakra-ui/react";
-import holder from '../api/holder';
-//import { useHelper } from '../config/helper-hook';
+import { ChatState } from "../Context/ChatProvider";
+import holder from "../api/holder";
+import { getItemFromLocalStorage } from "../utils/local";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
 
-  const { selectedChat, setSelectedChat, user, chats, setChats } = useContext(ChatContext);
-  //const {getSender}=useHelper();
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
   const toast = useToast();
-  
+
   const fetchChats = async () => {
     // console.log(user._id);
     try {
       const config = {
-        headers: { Authorization: `Bearer ${user.token}`}
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
       };
 
       const { data } = await holder.get("/api/chat", config);
       setChats(data);
-      console.log(data, 'fetching all users chats in my chats');
-
     } catch (error) {
-
-      console.log(error.message);
       toast({
         title: "Error Occured!",
         description: "Failed to Load the chats",
         status: "error",
-        duration: 3000,
+        duration: 5000,
         isClosable: true,
         position: "bottom-left",
       });
     }
   };
 
-
-
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInformation"))); //chatLogics 
+    setLoggedUser(getItemFromLocalStorage("userInfo"));
     fetchChats();
-    // eslint-disable-next-line
   }, [fetchAgain]);
-  //fetching chats again witht the updated list of all of our chats...
-  //--when we leave a group our updated list of chats needs to be fetched again
 
   return (
     <Box
@@ -98,8 +89,7 @@ const MyChats = ({ fetchAgain }) => {
       >
         {chats ? (
           <Stack overflowY="scroll">
-            {chats.map((chat, i) => (
-              
+            {chats.map((chat) => (
               <Box
                 onClick={() => setSelectedChat(chat)}
                 cursor="pointer"
@@ -111,8 +101,18 @@ const MyChats = ({ fetchAgain }) => {
                 key={chat._id}
               >
                 <Text>
-                  {!chat.isGroupChat ? getSender(loggedUser, chat.users) : chat.chatName}
+                  {!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)
+                    : chat.chatName}
                 </Text>
+                {chat.latestMessage && (
+                  <Text fontSize="xs">
+                    <b>{chat.latestMessage.sender.name} : </b>
+                    {chat.latestMessage.content.length > 50
+                      ? chat.latestMessage.content.substring(0, 51) + "..."
+                      : chat.latestMessage.content}
+                  </Text>
+                )}
               </Box>
             ))}
           </Stack>
