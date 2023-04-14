@@ -6,13 +6,13 @@ import { IconButton, Spinner, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import ProfileModal from "./miscellaneous/ProfileModal";
+import ProfileModal from "./template/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import Lottie from "react-lottie";
 import animationData from "../animations/typing.json";
 
 import io from "socket.io-client";
-import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
+import UpdateGroupChatModal from "./template/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
 import holder from "../api/holder";
 const ENDPOINT = "http://localhost:5000"

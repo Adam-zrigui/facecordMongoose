@@ -4,7 +4,7 @@ import { useToast } from "@chakra-ui/toast";
 import { useEffect, useState } from "react";
 import { getSender } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
-import GroupChatModal from "./miscellaneous/GroupChatModal";
+import GroupChatModal from "./template/GroupChatModal";
 import { Button } from "@chakra-ui/react";
 import { ChatState } from "../Context/ChatProvider";
 import holder from "../api/holder";

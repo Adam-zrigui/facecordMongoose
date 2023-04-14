@@ -18,8 +18,8 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
-import UserBadgeItem from "../userAvatar/UserBadgeItem";
-import UserListItem from "../userAvatar/UserListItem";
+import UserBadgeItem from "../ui/UserBadgeItem";
+import UserListItem from "../ui/UserListItem";
 import holder from "../../api/holder";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
